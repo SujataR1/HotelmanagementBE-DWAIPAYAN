@@ -1,8 +1,14 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
+const { v4: uuidv4 } = require("uuid");
 
 const userSchema = new mongoose.Schema(
 {
+    userId: {
+      type: String,
+      default: uuidv4,   
+      unique: true
+    },
     Name: {
         type: String,
         required: true,

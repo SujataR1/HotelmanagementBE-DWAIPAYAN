@@ -4,6 +4,7 @@ const {generateToken}=require("../utils/jwtToken");
 module.exports.customerlogin=async(req,res)=>{
   try {
     const { Email, Phoneno, Password } = req.body;
+    console.log(req.body);
     if (!Email || !Phoneno || !Password) {
       return res.status(400).json({ message: "All fields are required" });
     }
@@ -22,7 +23,7 @@ module.exports.customerlogin=async(req,res)=>{
     
     return res.status(200).json({
       message: "Login successful",
-      Id: user._id.toString(),
+      Id: user.userId,
       Email: user.Email,
       RoleType: user.RoleType,
       Token:jwt_token

@@ -21,7 +21,10 @@ module.exports.customersignup=async(req,res,next)=>{
       RoleType
     });
 
-    return res.status(201).json({ message: "User registered successfully" });
+    return res.status(201).json({ 
+      message: "User registered successfully",
+      userId:user.userId
+    });
   } catch (err) {
     console.error(err);
     return res.status(500).json({ message: "Signup failed" });

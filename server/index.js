@@ -1,6 +1,3 @@
-
-
-
 const express = require("express");
 const mongoose = require("mongoose");
 const swaggerUI = require("swagger-ui-express");
