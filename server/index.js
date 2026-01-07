@@ -17,9 +17,9 @@ mongoose
   .then(() => console.log("✅ MongoDB connected successfully"))
   .catch(err => console.log("❌ Mongo error:", err));
 
-//app.use("/users", userRoutes);
+app.use("/users", userRoutes);
 app.use("/",router);
-//app.use("/api-docs", swaggerUI.serve, swaggerUI.setup(swaggerSpec));
+app.use("/api-docs", swaggerUI.serve, swaggerUI.setup(swaggerSpec));
 
 const PORT = 5000;
 app.listen(PORT, () => {

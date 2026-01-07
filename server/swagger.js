@@ -14,7 +14,7 @@ const options = {
       }
     ]
   },
-  apis: ["server/auth/auth.js"]
+  apis: ["./auth/*.js"]
 };
 
 const swaggerSpace = swaggerJSDoc(options);
