@@ -1,14 +1,8 @@
-// const {customerlogin}=require("./customerlogin");
-// const {customersignup}=require("./customersignup");
-// const router=require("express").Router();
-
-// router.post("/customerlogin",customerlogin);
-// router.post("/customersignup",customersignup);
-// module.exports=router;
 
 const {customerlogin}=require("./customerlogin");
 const {customersignup}=require("./customersignup");
 const router=require("express").Router();
+
 /**
  * @swagger
  * tags:
@@ -35,10 +29,13 @@ const router=require("express").Router();
  *             properties:
  *               Email:
  *                 type: string
+ *                 example: "sneha.sharma@example.com"
  *               Phoneno:
- *                 type: number
+ *                 type: string
+ *                 example: "9876543210"
  *               Password:
  *                 type: string
+ *                 example: "StrongPass@123"
  *     responses:
  *       200:
  *         description: Login successful
@@ -64,19 +61,24 @@ router.post("/customerlogin",customerlogin);
  *               - Email
  *               - Phoneno
  *               - Password
- *               - RoleType:ADMIN /CUSTOMER /STAFF
+ *               - RoleType
  *             properties: 
- *               Name :
- *                 type:string
+ *               Name:
+ *                 type: string
+ *                 example: "Sneha Sharma"
  *               Email:
  *                 type: string
+ *                 example: "sneha.sharma@example.com"
  *               Phoneno:
- *                 type: number
+ *                 type: string
+ *                 example: "9876543210"
  *               Password:
  *                 type: string
+ *                 example: "StrongPass@123"
  *               RoleType:
- *                 type: ADMIN /CUSTOMER /STAFF
- * 
+ *                 type: string
+ *                 enum: ["ADMIN", "CUSTOMER", "STAFF"]
+ *                 example: "CUSTOMER"
  *     responses:
  *       201:
  *         description: Signup successful
