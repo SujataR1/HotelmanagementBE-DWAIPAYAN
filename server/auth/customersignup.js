@@ -33,7 +33,7 @@
 
 
 const User = require("../models/userModel");
-
+const otpRoutes=require("../otpgeneration/index");
 module.exports.customersignup = async (req, res) => {
   try {
     const {

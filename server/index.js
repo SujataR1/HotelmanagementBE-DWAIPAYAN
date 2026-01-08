@@ -36,13 +36,14 @@ const express = require("express");
 const mongoose = require("mongoose");
 const swaggerUI = require("swagger-ui-express");
 const swaggerSpec = require("./swagger");
-//const userRoutes = require("./routes/userroutes");
+const otpRoutes = require("./otpgeneration/index");
+const cors = require("cors");
 const authRouter = require("./auth/auth");
 const app = express();
 
 /* ================= Middleware ================= */
 app.use(express.json());
-
+app.use(cors());
 /* ================= Root Route (FIX for Cannot GET /) ================= */
 app.get("/", (req, res) => {
   res.status(200).send("🚀 Backend API is running successfully");
@@ -52,7 +53,7 @@ app.get("/", (req, res) => {
 //app.use("/users", userRoutes);      // http://IP:5000/users
 app.use("/", authRouter);            // /customerlogin, /customersignup
 app.use("/api-docs", swaggerUI.serve, swaggerUI.setup(swaggerSpec));
-
+app.use("/otp",otpRoutes);
 /* ================= MongoDB ================= */
 const DATABASE = process.env.DATABASE;
 mongoose

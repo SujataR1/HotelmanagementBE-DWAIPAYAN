@@ -3,18 +3,17 @@ const User = require("../models/userModel");
 const {generateToken}=require("../utils/jwtToken");
 module.exports.customerlogin=async(req,res)=>{
   try {
-    const { Email, Phoneno, Password } = req.body;
+    const { email, phone, password } = req.body;
     console.log(req.body);
-    if (!Email || !Phoneno || !Password) {
+    if (!email || !phone || !password) {
       return res.status(400).json({ message: "All fields are required" });
     }
-
-    const user = await User.findOne({ Email, Phoneno });
+    const user = await User.findOne({ email, phoneno });
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
 
-    const isMatch = await user.comparePassword(Password);
+    const isMatch = await user.comparePassword(password);
     if (!isMatch) {
       return res.status(401).json({ message: "Invalid password" });
     }
