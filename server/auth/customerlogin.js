@@ -24,8 +24,8 @@ module.exports.customerlogin=async(req,res)=>{
     return res.status(200).json({
       message: "Login successful",
       Id: user.userId,
-      Email: user.Email,
-      RoleType: user.RoleType,
+      Email: user.email,
+      RoleType: user.roleType,
       Token:jwt_token
     });
 
