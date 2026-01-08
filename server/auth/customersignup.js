@@ -53,6 +53,10 @@ module.exports.customersignup = async (req, res) => {
     } = req.body;
 
     // 1️⃣ Basic required validation
+
+    if (!email) {
+    return res.status(400).json({ message: "Email is required" });
+   }
     if (
       !firstName || !lastName || !email || !phone ||
       !password || !address || !preferences || !emergencyContact
@@ -80,7 +84,7 @@ module.exports.customersignup = async (req, res) => {
     const user = await User.create({
       firstName,
       lastName,
-      email,
+      email: email.toLowerCase().trim(),
       phone,
       password,
       dateOfBirth,
