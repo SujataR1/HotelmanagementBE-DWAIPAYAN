@@ -2,36 +2,56 @@ const express=require("express");
 const router=express.Router();
 const {validateGST}=require("../utils/gstValidator");
 const {gstAPI} = require("../utils/gstApi");
+const GST=require("../model/gstModel");
 router.post("/check-gst", async(req, res) => {
-  const { gst } = req.body;
+  const {  email , gst } = req.body;
 
   const result = validateGST(gst);
-  // ✅ VALID GST
- if (result.valid) {
+
+  if (!result.valid) {
+    return res.status(400).json({
+      success: false,
+      message: result.error
+    });
+  }
+
   try {
-    // await the API call to get real data
+    // Get GST data
     const gstData = await gstAPI(gst);
 
-    console.log(gstData);  // ✅ This is the actual data now
+    // Save to MongoDB
+    const savedGST = await GST.create({
+      email:email,
+      gstin: gstData.taxpayerInfo.gstin,
+      companyName: gstData.taxpayerInfo.lgnm,
+      location: gstData.taxpayerInfo.stj,
+      registrationdate: gstData.taxpayerInfo.rgdt,
+      status: gstData.taxpayerInfo.sts,
+      lastupdate: gstData.taxpayerInfo.lstupdt
+    });
+
+    console.log("Saved GST:", savedGST);
+
+    // Fetch saved record
+    const record = await GST.findOne({ email });
+
+    if (record) {
+      console.log(
+        `GST ${record.gstin}, Location ${record.location}, Company ${record.companyName}`
+      );
+    }
 
     return res.status(200).json({
-      data: gstData,       // actual API response
       success: true,
       message: "GST number is valid",
+      data: gstData
     });
+
   } catch (error) {
     return res.status(500).json({
       success: false,
       message: "Failed to fetch GST data",
       error: error.message
-    });
-  }
-}
- // ❌ INVALID GST
-  if (!result.valid) {
-    return res.status(400).json({
-      success: false,
-      message: result.error
     });
   }
 });
