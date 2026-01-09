@@ -40,7 +40,7 @@ const otpRoutes = require("./otpgeneration/index");
 const cors = require("cors");
 const authRouter = require("./auth/auth");
 const app = express();
-
+const gstRoute=require("./GSTIN/routes/gstroutes");
 /* ================= Middleware ================= */
 app.use(express.json());
 app.use(cors());
@@ -54,6 +54,7 @@ app.get("/", (req, res) => {
 app.use("/", authRouter);            // /customerlogin, /customersignup
 app.use("/api-docs", swaggerUI.serve, swaggerUI.setup(swaggerSpec));
 app.use("/otp",otpRoutes);
+app.use("/gst",gstRoute);
 /* ================= MongoDB ================= */
 const DATABASE = process.env.DATABASE;
 mongoose

@@ -1,39 +1,5 @@
-// const bcrypt=require('bcrypt');
-// const User = require("../models/userModel");
-// const uuid=require("uuid");
-// module.exports.customersignup=async(req,res,next)=>{
-//   try {
-//     const { Name, Email, Phoneno, Password, RoleType } = req.body;
-
-//     const existingEmail = await User.findOne({ Email });
-//     if (existingEmail)
-//       return res.status(400).json({ message: "Email already exists" });
-
-//     const existingPhone = await User.findOne({ Phoneno });
-//     if (existingPhone)
-//       return res.status(400).json({ message: "Phone already exists" });
-
-//     const user = await User.create({
-//       Name,
-//       Email,
-//       Phoneno,
-//       Password,
-//       RoleType
-//     });
-
-//     return res.status(201).json({ 
-//       message: "User registered successfully",
-//       userId:user.userId
-//     });
-//   } catch (err) {
-//     console.error(err);
-//     return res.status(500).json({ message: "Signup failed" });
-//   }
-// };
-
-
 const User = require("../models/userModel");
-const otpRoutes=require("../otpgeneration/index");
+const Otp=require("../otpgeneration/models/otpmodels")
 module.exports.customersignup = async (req, res) => {
   try {
     const {
@@ -52,41 +18,63 @@ module.exports.customersignup = async (req, res) => {
       roleType
     } = req.body;
 
-    // 1️⃣ Basic required validation
-
-    if (!email) {
-    return res.status(400).json({ message: "Email is required" });
-   }
+    /* ================= 1️⃣ Required Field Validation ================= */
     if (
-      !firstName || !lastName || !email || !phone ||
-      !password || !address || !preferences || !emergencyContact
+      !firstName ||
+      !lastName ||
+      !email ||
+      !phone ||
+      !password ||
+      !address ||
+      !preferences ||
+      !emergencyContact
     ) {
       return res.status(400).json({
         message: "All required fields must be provided"
       });
     }
 
-    // 2️⃣ Email check
-    const existingEmail = await User.findOne({ email });
+    /* ================= 2️⃣ Normalize Email ================= */
+    const normalizedEmail = email.toLowerCase().trim();
+
+    /* ================= 3️⃣ Email Already Exists Check ================= */
+    const existingEmail = await User.findOne({ email: normalizedEmail });
     if (existingEmail) {
-      return res.status(400).json({ message: "Email already exists" });
+      return res.status(409).json({
+        message: "Email already exists"
+      });
     }
 
-    // 3️⃣ Phone check
+    /* ================= 4️⃣ OTP Verification Check ================= */
+    const otpRecord = await Otp.findOne({
+      email: normalizedEmail,
+      isVerified: true
+    });
+
+    if (!otpRecord) {
+      return res.status(400).json({
+        message: "Please verify OTP first"
+      });
+    }
+
+    /* ================= 5️⃣ Phone Number Uniqueness ================= */
     const existingPhone = await User.findOne({
       "phone.number": phone.number
     });
+
     if (existingPhone) {
-      return res.status(400).json({ message: "Phone number already exists" });
+      return res.status(409).json({
+        message: "Phone number already exists"
+      });
     }
 
-    // 4️⃣ Create user (ALL DATA AT ONCE)
+    /* ================= 6️⃣ Create User ================= */
     const user = await User.create({
       firstName,
       lastName,
-      email: email.toLowerCase().trim(),
+      email: normalizedEmail,
       phone,
-      password,
+      password, // hashed by model middleware
       dateOfBirth,
       gender,
       address,
@@ -97,14 +85,19 @@ module.exports.customersignup = async (req, res) => {
       roleType: roleType || "CUSTOMER"
     });
 
-    // 5️⃣ Success response
+    /* ================= 7️⃣ Delete OTP After Successful Signup ================= */
+    await Otp.deleteOne({ email: normalizedEmail });
+
+    /* ================= 8️⃣ Success Response ================= */
     return res.status(201).json({
       message: "User registered successfully",
       userId: user.userId
     });
 
   } catch (error) {
-    console.error(error);
-    return res.status(500).json({ message: "Signup failed" });
+    console.error("Signup Error:", error);
+    return res.status(500).json({
+      message: "Signup failed"
+    });
   }
 };
