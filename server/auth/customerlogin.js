@@ -1,0 +1,35 @@
+const bcrypt=require('bcrypt');
+const User = require("../models/userModel");
+const {generateToken}=require("../utils/jwtToken");
+module.exports.customerlogin=async(req,res)=>{
+  try {
+    const { email, phone, password } = req.body;
+    console.log(req.body);
+    if (!email || !phone || !password) {
+      return res.status(400).json({ message: "All fields are required" });
+    }
+    const user = await User.findOne({ email, phoneno });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const isMatch = await user.comparePassword(password);
+    if (!isMatch) {
+      return res.status(401).json({ message: "Invalid password" });
+    }
+    
+    const jwt_token = generateToken(user);
+    
+    return res.status(200).json({
+      message: "Login successful",
+      Id: user.userId,
+      Email: user.email,
+      RoleType: user.roleType,
+      Token:jwt_token
+    });
+
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Login failed" });
+  }
+};
